@@ -328,3 +328,4 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+TvMazeScraper/TvMazeScraper/appsettings.Development.json
