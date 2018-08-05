@@ -22,7 +22,7 @@ namespace TvMazeScraper.Services
 
             var mongoDbConnectionString = $"mongodb://{user}:{password}@ds113482.mlab.com:13482/{database}";
 
-            var client = new MongoClient();
+            var client = new MongoClient(mongoDbConnectionString);
 
             return client;
         }   

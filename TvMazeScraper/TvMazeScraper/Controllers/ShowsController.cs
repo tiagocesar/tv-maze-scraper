@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TvMazeScraper.Models;
 using TvMazeScraper.Services;
 
 namespace TvMazeScraper.Controllers
@@ -14,12 +16,8 @@ namespace TvMazeScraper.Controllers
             _showsService = showsService;
         }
         
-        // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] {"value1", "value2"};
-        }
+        public async Task<List<Show>> Get() => await _showsService.List();
 
         // GET api/values/5
         [HttpGet("{id}")]
