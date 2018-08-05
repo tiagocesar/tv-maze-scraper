@@ -9,7 +9,7 @@ namespace TvMazeScraper.Configuration.DependencyInjection
         public static IServiceCollection AddServices(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddTransient<IShowsService, ShowsesService>();
+            services.AddTransient<IShowsService, ShowsService>();
 
             return services;
         }

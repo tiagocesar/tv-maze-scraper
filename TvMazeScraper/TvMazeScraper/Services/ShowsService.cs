@@ -8,12 +8,12 @@ using TvMazeScraper.Models;
 
 namespace TvMazeScraper.Services
 {
-    public class ShowsesService : IShowsService
+    public class ShowsService : IShowsService
     {
         private readonly MongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
         
-        public ShowsesService(IMongoDbClientFactory clientFactory, MongoDbOptions mongoDbOptions)
+        public ShowsService(IMongoDbClientFactory clientFactory, MongoDbOptions mongoDbOptions)
         {
             _client = clientFactory.GetClient();
             _mongoDbOptions = mongoDbOptions;
