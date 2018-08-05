@@ -10,8 +10,9 @@ namespace TvMazeScraper.Configuration.DependencyInjection
         public static IServiceCollection AddPersistence(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSingleton<IMongoDbClientFactory, ClientFactory>();
             services.Configure<MongoDbOptions>(configuration.GetSection("Database:MongoDb"));
+            
+            services.AddSingleton<IMongoDbClientFactory, ClientFactory>();
 
             return services;
         }

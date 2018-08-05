@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using TvMazeScraper.Configuration.Options;
 
 namespace TvMazeScraper.Services
@@ -7,16 +8,16 @@ namespace TvMazeScraper.Services
     {
         private readonly MongoDbOptions _mongoDbOptions;
 
-        public ClientFactory(MongoDbOptions mongoDbOptions)
+        public ClientFactory(IOptions<MongoDbOptions> mongoDbOptions)
         {
-            _mongoDbOptions = mongoDbOptions;
+            _mongoDbOptions = mongoDbOptions.Value;
         }
         
         public MongoClient GetClient()
         {
             // TODO Move those properties to the appsettings
-            var dbUser = _mongoDbOptions.User;
-            var dbPassword = _mongoDbOptions.Password;
+            var dbUser = _mongoDbOptions.User; // mdb1
+            var dbPassword = _mongoDbOptions.Password; // R456*asfnl.
 
             var mongoDbConnectionString = $"mongodb://{dbUser}:{dbPassword}@ds113482.mlab.com:13482/tvmazescraper";
 

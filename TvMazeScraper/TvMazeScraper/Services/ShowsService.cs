@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -13,10 +14,10 @@ namespace TvMazeScraper.Services
         private readonly MongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
         
-        public ShowsService(IMongoDbClientFactory clientFactory, MongoDbOptions mongoDbOptions)
+        public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
         {
             _client = clientFactory.GetClient();
-            _mongoDbOptions = mongoDbOptions;
+            _mongoDbOptions = mongoDbOptions.Value;
         }
 
         private IMongoCollection<Show> GetShowsCollection()
