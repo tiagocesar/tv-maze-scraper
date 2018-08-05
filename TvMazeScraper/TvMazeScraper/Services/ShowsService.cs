@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using TvMazeScraper.Configuration.Options;
 using TvMazeScraper.Models;
 
@@ -18,21 +19,23 @@ namespace TvMazeScraper.Services
             _mongoDbOptions = mongoDbOptions;
         }
 
-        private IMongoCollection<BsonDocument> GetShowsCollection()
+        private IMongoCollection<Show> GetShowsCollection()
         {
             var db = _client.GetDatabase(_mongoDbOptions.Database);
             
-            var collection = db.GetCollection<BsonDocument>("show");
+            var collection = db.GetCollection<Show>("show");
 
             return collection;
         }
         
 
-        public Task<List<Show>> List()
+        public async Task<List<Show>> List()
         {
             var collection = GetShowsCollection();
-            
-            collection.
+
+            var shows = await collection.AsQueryable<Show>().ToListAsync();
+
+            return shows;
         }
 
         public Task<Show> GetShow(int id)
@@ -44,7 +47,7 @@ namespace TvMazeScraper.Services
         {
             var collection = GetShowsCollection();
 
-            await collection.InsertOneAsync(show.ToBsonDocument());
+            await collection.InsertOneAsync(show);
         }
     }
 }
