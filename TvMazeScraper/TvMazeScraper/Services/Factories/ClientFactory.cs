@@ -1,21 +1,23 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using RestSharp;
 using TvMazeScraper.Configuration.Options;
 
 namespace TvMazeScraper.Services.Factories
 {
-    public class ClientFactory : IMongoDbClientFactory
+    public class ClientFactory : IMongoDbClientFactory, IRestSharpClientFactory
     {
         private readonly MongoDbOptions _mongoDbOptions;
+        private readonly TvMazeAPIOptions _tvMazeApiOptions;
 
-        public ClientFactory(IOptions<MongoDbOptions> mongoDbOptions)
+        public ClientFactory(IOptions<MongoDbOptions> mongoDbOptions, IOptions<TvMazeAPIOptions> tvMazeAPIOptions)
         {
             _mongoDbOptions = mongoDbOptions.Value;
+            _tvMazeApiOptions = tvMazeAPIOptions.Value;
         }
         
-        public MongoClient GetClient()
+        public MongoClient GetMongoDbClient()
         {
-            // TODO Move those properties to the appsettings
             var user = _mongoDbOptions.User;
             var password = _mongoDbOptions.Password;
             var database = _mongoDbOptions.Database;
@@ -25,6 +27,13 @@ namespace TvMazeScraper.Services.Factories
             var client = new MongoClient(mongoDbConnectionString);
 
             return client;
-        }   
+        }
+
+        public IRestClient GetRestClient()
+        {
+            var client = new RestClient(_tvMazeApiOptions.Endpoint);
+
+            return client;
+        }
     }
 }

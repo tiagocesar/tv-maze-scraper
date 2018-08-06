@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -15,7 +17,7 @@ namespace TvMazeScraper.Services
         
         public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
         {
-            _client = clientFactory.GetClient();
+            _client = clientFactory.GetMongoDbClient();
             _mongoDbOptions = mongoDbOptions.Value;
         }
 
@@ -38,9 +40,18 @@ namespace TvMazeScraper.Services
             return shows;
         }
 
-        public Task<Show> GetShow(int id)
+        public async Task<Show> GetShow(int id)
         {
-            throw new System.NotImplementedException();
+            if (id == default)
+            {
+                throw new ArgumentException("Inform a valid show id");
+            }
+
+            var collection = GetShowsCollection();
+
+            var show = await collection.Find(x => x.Id == id).ToListAsync();
+
+            return show.FirstOrDefault();
         }
 
         public async Task AddShow(Show show)

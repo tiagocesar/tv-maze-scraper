@@ -11,9 +11,11 @@ namespace TvMazeScraper.Configuration.DependencyInjection
             IConfiguration configuration)
         {
             services.Configure<MongoDbOptions>(configuration.GetSection("Database:MongoDb"));
+            services.Configure<TvMazeAPIOptions>(configuration.GetSection("TvMazeAPI"));
             
             services.AddSingleton<IMongoDbClientFactory, ClientFactory>();
-
+            services.AddSingleton<IRestSharpClientFactory, ClientFactory>();
+            
             return services;
         }
     }

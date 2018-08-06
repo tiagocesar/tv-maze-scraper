@@ -19,11 +19,7 @@ namespace TvMazeScraper.Controllers
         [HttpGet]
         public async Task<List<Show>> Get() => await _showsService.List();
 
-        // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        public async Task<Show> Get(int id) => await _showsService.GetShow(id);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TvMazeScraper.Models
 {
-    public class Cast
+    public class PersonResult
     {
         public int Id { get; set; }
         public string Name { get; set; }
