@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TvMazeScraper.Models;
 using TvMazeScraper.Services;
 
 namespace TvMazeScraper.Controllers
@@ -16,13 +16,10 @@ namespace TvMazeScraper.Controllers
             _tvShowScraperService = tvShowScraperService;
         }
 
-        [HttpGet("{page}")]
-        public IEnumerable<Show> Get(int page) => _tvShowScraperService.ScrapeShowsInfo(page);
-
         [HttpGet]
-        public List<(int page, int itens)> ScrapeShows()
+        public async Task<List<(int page, int itens)>> ScrapeShows()
         {
-            var status = _tvShowScraperService.ScrapeShows().ToList();
+            var status = (await _tvShowScraperService.ScrapeShows()).ToList();
 
             return status;
         }
