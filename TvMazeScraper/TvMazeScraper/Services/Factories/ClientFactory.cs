@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using TvMazeScraper.Configuration.Options;
 
-namespace TvMazeScraper.Services
+namespace TvMazeScraper.Services.Factories
 {
     public class ClientFactory : IMongoDbClientFactory
     {
