@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace TvMazeScraper.Services
+namespace TvMazeScraper.Services.Interfaces
 {
     public interface ITvShowScraperService
     {

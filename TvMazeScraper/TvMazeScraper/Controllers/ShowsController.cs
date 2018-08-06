@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TvMazeScraper.Models;
-using TvMazeScraper.Services;
+using TvMazeScraper.Domain.Models;
+using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Controllers
 {

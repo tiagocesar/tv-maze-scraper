@@ -1,5 +1,6 @@
 ﻿using Omu.ValueInjecter;
-using TvMazeScraper.Models;
+using TvMazeScraper.Domain.Models;
+using TvMazeScraper.Domain.Responses;
 
 namespace TvMazeScraper.Services.Mappers
 {

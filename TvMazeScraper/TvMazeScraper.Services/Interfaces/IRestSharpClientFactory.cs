@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace TvMazeScraper.Services.Factories
+namespace TvMazeScraper.Services.Interfaces
 {
     public interface IRestSharpClientFactory
     {
