@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using TvMazeScraper.Configuration.Options;
 using TvMazeScraper.Models;
+using TvMazeScraper.Services.Factories;
 
 namespace TvMazeScraper.Services
 {
@@ -34,7 +33,7 @@ namespace TvMazeScraper.Services
         {
             var collection = GetShowsCollection();
 
-            var shows = await collection.AsQueryable<Show>().ToListAsync();
+            var shows = await collection.AsQueryable().ToListAsync();
 
             return shows;
         }
