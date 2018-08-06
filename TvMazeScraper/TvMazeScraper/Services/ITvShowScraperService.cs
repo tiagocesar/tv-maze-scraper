@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace TvMazeScraper.Services
 {
     public interface ITvShowScraperService
     {
-        Task<IEnumerable<(int page, int itens)>> ScrapeShows();
+        Task ScrapeShows();
     }
 }

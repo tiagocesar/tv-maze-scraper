@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TvMazeScraper.Services;
 
@@ -17,11 +15,6 @@ namespace TvMazeScraper.Controllers
         }
 
         [HttpGet]
-        public async Task<List<(int page, int itens)>> ScrapeShows()
-        {
-            var status = (await _tvShowScraperService.ScrapeShows()).ToList();
-
-            return status;
-        }
+        public async Task ScrapeShows() => await _tvShowScraperService.ScrapeShows();
     }
 }

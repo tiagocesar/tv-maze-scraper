@@ -27,10 +27,8 @@ namespace TvMazeScraper.Services
             _tvMazeAPIOptions = tvMazeAPIOptions.Value;
         }
 
-        public async Task<IEnumerable<(int page, int itens)>> ScrapeShows()
+        public async Task ScrapeShows()
         {
-            var results = new List<(int page, int itens)>();
-
             var endOfList = false;
             var page = 1;
 
@@ -38,7 +36,6 @@ namespace TvMazeScraper.Services
             {
                 var shows = (await ScrapeShowsInfo(page)).ToList();
 
-                results.Add((page, shows.Count));
                 page++;
 
                 if (!shows.Any())
@@ -46,8 +43,6 @@ namespace TvMazeScraper.Services
                     endOfList = true;
                 }
             }
-
-            return results;
         }
         
         private async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
@@ -73,12 +68,12 @@ namespace TvMazeScraper.Services
 
             var shows = showsResponse.Data;
             
-            await GetCast(shows);
+            await GetCastTasks(shows);
             
             return shows;
         }
 
-        private async Task GetCast(IEnumerable<Show> shows)
+        private async Task GetCastTasks(IEnumerable<Show> shows)
         {
             var tasks = shows.Select(GetCastFromAPI);
 
@@ -113,8 +108,7 @@ namespace TvMazeScraper.Services
             }
         }
 
-        // ReSharper disable once MemberCanBeMadeStatic.Local
-        private RetryPolicy<IRestResponse<T>> GetAsyncRetryPolicy<T>()
+        private static RetryPolicy<IRestResponse<T>> GetAsyncRetryPolicy<T>()
         {
             var jitterer = new Random();
 
