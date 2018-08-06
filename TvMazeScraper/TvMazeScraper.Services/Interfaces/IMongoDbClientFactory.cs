@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace TvMazeScraper.Services.Factories
+namespace TvMazeScraper.Services.Interfaces
 {
     public interface IMongoDbClientFactory
     {

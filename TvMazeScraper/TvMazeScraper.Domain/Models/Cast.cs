@@ -1,4 +1,4 @@
-﻿namespace TvMazeScraper.Models
+﻿namespace TvMazeScraper.Domain.Models
 {
     public class Cast
     {

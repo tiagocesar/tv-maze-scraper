@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using RestSharp;
-using TvMazeScraper.Configuration.Options;
+using TvMazeScraper.Domain.Options;
+using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Services.Factories
 {

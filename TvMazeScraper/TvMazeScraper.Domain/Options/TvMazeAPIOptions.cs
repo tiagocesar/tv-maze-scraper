@@ -1,4 +1,4 @@
-﻿namespace TvMazeScraper.Configuration.Options
+﻿namespace TvMazeScraper.Domain.Options
 {
     public class TvMazeAPIOptions
     {

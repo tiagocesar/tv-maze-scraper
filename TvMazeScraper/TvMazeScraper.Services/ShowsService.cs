@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using TvMazeScraper.Configuration.Options;
-using TvMazeScraper.Models;
-using TvMazeScraper.Services.Factories;
+using TvMazeScraper.Domain.Models;
+using TvMazeScraper.Domain.Options;
+using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Services
 {
@@ -59,6 +59,13 @@ namespace TvMazeScraper.Services
             var collection = GetShowsCollection();
 
             await collection.InsertOneAsync(show);
+        }
+
+        public async Task AddShows(IEnumerable<Show> shows)
+        {
+            var collection = GetShowsCollection();
+
+            await collection.InsertManyAsync(shows);
         }
     }
 }

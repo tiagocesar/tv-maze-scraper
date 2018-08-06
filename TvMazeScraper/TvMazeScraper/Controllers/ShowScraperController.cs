@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TvMazeScraper.Services;
+using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Controllers
 {

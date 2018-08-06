@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TvMazeScraper.Configuration.Options;
+using TvMazeScraper.Domain.Options;
 using TvMazeScraper.Services.Factories;
+using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Configuration.DependencyInjection
 {
