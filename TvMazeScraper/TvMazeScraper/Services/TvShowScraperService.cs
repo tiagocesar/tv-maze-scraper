@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -58,7 +59,7 @@ namespace TvMazeScraper.Services
 
         public IEnumerable<Show> ScrapeShowsInfo(int page)
         {
-            if (page == default)
+             if (page == default)
             {
                 throw new ArgumentException("Specify a valid page number");
             }
@@ -87,6 +88,29 @@ namespace TvMazeScraper.Services
 
                 return JsonConvert.DeserializeObject<List<Show>>(showResponse.Content);
             }
+        }
+
+        public IEnumerable<(int page, int itens)> ScrapeShows()
+        {
+            var results = new List<(int page, int itens)>();
+            
+            var endOfList = false;
+            var page = 1;
+
+            while (!endOfList)
+            {
+                var shows = ScrapeShowsInfo(page).ToList();
+                
+                results.Add((page, shows.Count));
+                page++;
+
+                if (!shows.Any())
+                {
+                    endOfList = true;
+                }
+            }
+
+            return results;
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local

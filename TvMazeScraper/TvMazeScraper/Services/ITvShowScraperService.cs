@@ -7,5 +7,6 @@ namespace TvMazeScraper.Services
     {
         Show GetShowInfo(int id);
         IEnumerable<Show> ScrapeShowsInfo(int page);
+        IEnumerable<(int page, int itens)> ScrapeShows();
     }
 }
