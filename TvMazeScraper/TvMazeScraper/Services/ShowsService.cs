@@ -15,7 +15,7 @@ namespace TvMazeScraper.Services
         
         public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
         {
-            _client = clientFactory.GetClient();
+            _client = clientFactory.GetMongoDbClient();
             _mongoDbOptions = mongoDbOptions.Value;
         }
 
