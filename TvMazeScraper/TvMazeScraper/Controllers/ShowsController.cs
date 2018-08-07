@@ -20,6 +20,18 @@ namespace TvMazeScraper.Controllers
         public async Task<List<Show>> Get(int page, int count) => await _showsService.List(page, count);
 
         [HttpGet("{id}")]
-        public async Task<Show> Get(int id) => await _showsService.GetShow(id);
+        [ProducesResponseType(200, Type = typeof(Show))]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Get(int id)
+        {
+            var show = await _showsService.GetShow(id);
+
+            if (show == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(show);
+        }
     }
 }
