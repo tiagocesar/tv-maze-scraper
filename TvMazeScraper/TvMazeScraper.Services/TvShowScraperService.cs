@@ -52,7 +52,7 @@ namespace TvMazeScraper.Services
             }
         }
 
-        private async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
+        public virtual async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
         {
             ValidateParameters();
 
