@@ -60,6 +60,11 @@ namespace TvMazeScraper.Services
                 {
                     throw new ArgumentException("Inform a valid page number");
                 }
+                
+                if (count == default)
+                {
+                    throw new ArgumentException("Inform a valid number of documents per page");
+                }
 
                 if (count > 100)
                 {
