@@ -14,7 +14,7 @@ namespace TvMazeScraper.Services
     {
         private readonly MongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
-        
+
         public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
         {
             _client = clientFactory.GetMongoDbClient();
@@ -24,46 +24,77 @@ namespace TvMazeScraper.Services
         private IMongoCollection<Show> GetShowsCollection()
         {
             var db = _client.GetDatabase(_mongoDbOptions.Database);
-            
+
             var collection = db.GetCollection<Show>("show");
 
             return collection;
         }
-        
+
         public async Task<List<Show>> List(int page = 1, int count = 10)
         {
-            if (count > 100)
-            {
-                throw new ArgumentException("The maximum number of documents per page is 100");
-            }
-            
+            ValidateParameters();
+
             var elementsToSkip = (page - 1) * count;
-            
-            var collection = GetShowsCollection();
 
-            var shows = await collection
-                .Find(new BsonDocument())
-                .Skip(elementsToSkip)
-                .Limit(count)
-                .ToListAsync();
+            try
+            {
+                var collection = GetShowsCollection();
 
-            return shows;
+                var shows = await collection
+                    .Find(new BsonDocument())
+                    .Skip(elementsToSkip)
+                    .Limit(count)
+                    .ToListAsync();
+
+                return shows;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            void ValidateParameters()
+            {
+                if (page == default)
+                {
+                    throw new ArgumentException("Inform a valid page number");
+                }
+
+                if (count > 100)
+                {
+                    throw new ArgumentException("The maximum number of documents per page is 100");
+                }
+            }
         }
 
         public async Task<Show> GetShow(int id)
         {
-            if (id == default)
+            ValidateParameters();
+
+            try
             {
-                throw new ArgumentException("Inform a valid show id");
+                var collection = GetShowsCollection();
+
+                var filter = Builders<Show>.Filter.Eq("_id", id);
+
+                var show = await collection.Find(filter).FirstOrDefaultAsync();
+
+                return show;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
-            var collection = GetShowsCollection();
-
-            var filter = Builders<Show>.Filter.Eq("_id", id);
-
-            var show = await collection.Find(filter).FirstOrDefaultAsync();
-
-            return show;
+            void ValidateParameters()
+            {
+                if (id == default)
+                {
+                    throw new ArgumentException("Inform a valid show id");
+                }
+            }
         }
 
         public async Task AddShows(IEnumerable<Show> shows)
