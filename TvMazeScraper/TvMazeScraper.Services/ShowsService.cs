@@ -12,7 +12,7 @@ namespace TvMazeScraper.Services
 {
     public class ShowsService : IShowsService
     {
-        private readonly MongoClient _client;
+        private readonly IMongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
 
         public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
@@ -30,21 +30,41 @@ namespace TvMazeScraper.Services
             return collection;
         }
 
+        private static FindOptions<Show> GetListOptions(int page, int count)
+        {
+            if (page == default)
+            {
+                throw new ArgumentException("Inform a valid page number");
+            }
+
+            if (count == default)
+            {
+                throw new ArgumentException("Inform a valid number of documents per page");
+            }
+
+            if (count > 100)
+            {
+                throw new ArgumentException("The maximum number of documents per page is 100");
+            }
+            
+            var elementsToSkip = (page - 1) * count;
+            
+            var options = new FindOptions<Show> { Skip = elementsToSkip, Limit = count };
+
+            return options;
+        }
+
         public async Task<List<Show>> List(int page = 1, int count = 10)
         {
-            ValidateParameters();
-
-            var elementsToSkip = (page - 1) * count;
-
             try
             {
                 var collection = GetShowsCollection();
 
-                var shows = await collection
-                    .Find(new BsonDocument())
-                    .Skip(elementsToSkip)
-                    .Limit(count)
-                    .ToListAsync();
+                var options = GetListOptions(page, count);
+                
+                var cursor = await collection.FindAsync(new BsonDocument(), options);
+
+                var shows = await cursor.ToListAsync();
 
                 return shows;
             }
@@ -52,24 +72,6 @@ namespace TvMazeScraper.Services
             {
                 Console.WriteLine(e);
                 throw;
-            }
-
-            void ValidateParameters()
-            {
-                if (page == default)
-                {
-                    throw new ArgumentException("Inform a valid page number");
-                }
-                
-                if (count == default)
-                {
-                    throw new ArgumentException("Inform a valid number of documents per page");
-                }
-
-                if (count > 100)
-                {
-                    throw new ArgumentException("The maximum number of documents per page is 100");
-                }
             }
         }
 

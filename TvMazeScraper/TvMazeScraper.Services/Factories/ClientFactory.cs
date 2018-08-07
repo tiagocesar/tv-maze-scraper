@@ -18,7 +18,7 @@ namespace TvMazeScraper.Services.Factories
             _tvMazeApiOptions = tvMazeAPIOptions.Value;
         }
 
-        public MongoClient GetMongoDbClient()
+        public IMongoClient GetMongoDbClient()
         {
             try
             {
