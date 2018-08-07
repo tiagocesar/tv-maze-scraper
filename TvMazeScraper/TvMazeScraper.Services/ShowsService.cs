@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -49,9 +48,11 @@ namespace TvMazeScraper.Services
 
             var collection = GetShowsCollection();
 
-            var show = await collection.Find(x => x.Id == id).ToListAsync();
+            var filter = Builders<Show>.Filter.Eq("_id", id);
 
-            return show.FirstOrDefault();
+            var show = await collection.Find(filter).FirstOrDefaultAsync();
+
+            return show;
         }
 
         public async Task AddShow(Show show)
