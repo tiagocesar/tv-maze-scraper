@@ -14,7 +14,7 @@ namespace TvMazeScraper.Controllers
             _tvShowScraperService = tvShowScraperService;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task ScrapeShows() => await _tvShowScraperService.ScrapeShows();
     }
 }
