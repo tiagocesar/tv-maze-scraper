@@ -17,7 +17,7 @@ namespace TvMazeScraper.Controllers
         }
         
         [HttpGet]
-        public async Task<List<Show>> Get() => await _showsService.List();
+        public async Task<List<Show>> Get(int page, int count) => await _showsService.List(page, count);
 
         [HttpGet("{id}")]
         public async Task<Show> Get(int id) => await _showsService.GetShow(id);

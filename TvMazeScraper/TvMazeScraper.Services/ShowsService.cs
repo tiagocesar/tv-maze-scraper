@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using TvMazeScraper.Domain.Models;
 using TvMazeScraper.Domain.Options;
@@ -29,12 +30,22 @@ namespace TvMazeScraper.Services
             return collection;
         }
         
-
-        public async Task<List<Show>> List()
+        public async Task<List<Show>> List(int page = 1, int count = 10)
         {
+            if (count > 100)
+            {
+                throw new ArgumentException("The maximum number of documents per page is 100");
+            }
+            
+            var elementsToSkip = (page - 1) * count;
+            
             var collection = GetShowsCollection();
 
-            var shows = await collection.AsQueryable().ToListAsync();
+            var shows = await collection
+                .Find(new BsonDocument())
+                .Skip(elementsToSkip)
+                .Limit(count)
+                .ToListAsync();
 
             return shows;
         }
@@ -53,13 +64,6 @@ namespace TvMazeScraper.Services
             var show = await collection.Find(filter).FirstOrDefaultAsync();
 
             return show;
-        }
-
-        public async Task AddShow(Show show)
-        {
-            var collection = GetShowsCollection();
-
-            await collection.InsertOneAsync(show);
         }
 
         public async Task AddShows(IEnumerable<Show> shows)
