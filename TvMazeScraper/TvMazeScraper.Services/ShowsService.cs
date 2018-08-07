@@ -12,9 +12,9 @@ namespace TvMazeScraper.Services
 {
     public class ShowsService : IShowsService
     {
-        private readonly MongoClient _client;
+        private readonly IMongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
-        
+
         public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
         {
             _client = clientFactory.GetMongoDbClient();
@@ -24,14 +24,24 @@ namespace TvMazeScraper.Services
         private IMongoCollection<Show> GetShowsCollection()
         {
             var db = _client.GetDatabase(_mongoDbOptions.Database);
-            
+
             var collection = db.GetCollection<Show>("show");
 
             return collection;
         }
-        
-        public async Task<List<Show>> List(int page = 1, int count = 10)
+
+        private static FindOptions<Show> GetListOptions(int page, int count)
         {
+            if (page == default)
+            {
+                throw new ArgumentException("Inform a valid page number");
+            }
+
+            if (count == default)
+            {
+                throw new ArgumentException("Inform a valid number of documents per page");
+            }
+
             if (count > 100)
             {
                 throw new ArgumentException("The maximum number of documents per page is 100");
@@ -39,31 +49,59 @@ namespace TvMazeScraper.Services
             
             var elementsToSkip = (page - 1) * count;
             
-            var collection = GetShowsCollection();
+            var options = new FindOptions<Show> { Skip = elementsToSkip, Limit = count };
 
-            var shows = await collection
-                .Find(new BsonDocument())
-                .Skip(elementsToSkip)
-                .Limit(count)
-                .ToListAsync();
+            return options;
+        }
 
-            return shows;
+        public async Task<List<Show>> List(int page = 1, int count = 10)
+        {
+            try
+            {
+                var collection = GetShowsCollection();
+
+                var options = GetListOptions(page, count);
+                
+                var cursor = await collection.FindAsync(new BsonDocument(), options);
+
+                var shows = await cursor.ToListAsync();
+
+                return shows;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<Show> GetShow(int id)
         {
-            if (id == default)
+            ValidateParameters();
+
+            try
             {
-                throw new ArgumentException("Inform a valid show id");
+                var collection = GetShowsCollection();
+
+                var filter = Builders<Show>.Filter.Eq("_id", id);
+
+                var show = await collection.Find(filter).FirstOrDefaultAsync();
+
+                return show;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
-            var collection = GetShowsCollection();
-
-            var filter = Builders<Show>.Filter.Eq("_id", id);
-
-            var show = await collection.Find(filter).FirstOrDefaultAsync();
-
-            return show;
+            void ValidateParameters()
+            {
+                if (id == default)
+                {
+                    throw new ArgumentException("Inform a valid show id");
+                }
+            }
         }
 
         public async Task AddShows(IEnumerable<Show> shows)

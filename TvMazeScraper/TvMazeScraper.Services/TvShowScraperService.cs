@@ -39,7 +39,7 @@ namespace TvMazeScraper.Services
             while (!endOfList)
             {
                 var shows = (await ScrapeShowsInfo(page)).ToList();
-                
+
                 page++;
 
                 if (!shows.Any())
@@ -47,37 +47,56 @@ namespace TvMazeScraper.Services
                     endOfList = true;
                     continue;
                 }
-                
+
                 await _showsService.AddShows(shows);
             }
         }
 
-        private async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
+        public virtual async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
         {
-            if (page == default)
+            ValidateParameters();
+
+            try
             {
-                throw new ArgumentException("Specify a valid page number");
+                var showRequest = GetRequest();
+
+                var client = _clientFactory.GetRestClient();
+
+                var showsResponse = await client.ExecuteTaskAsync<List<Show>>(showRequest);
+
+                if (showsResponse.ErrorException != null)
+                {
+                    throw new Exception(showsResponse.ErrorMessage, showsResponse.ErrorException);
+                }
+
+                var shows = showsResponse.Data;
+
+                await GetCastTasks(shows);
+
+                return shows;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
-            var endpoint = _tvMazeAPIOptions.ShowPaginationTemplate;
-            var showRequest = new RestRequest(endpoint, Method.GET);
-
-            showRequest.AddUrlSegment("page", page);
-
-            var client = _clientFactory.GetRestClient();
-
-            var showsResponse = await client.ExecuteTaskAsync<List<Show>>(showRequest);
-
-            if (showsResponse.ErrorException != null)
+            void ValidateParameters()
             {
-                throw new Exception(showsResponse.ErrorMessage, showsResponse.ErrorException);
+                if (page == default)
+                {
+                    throw new ArgumentException("Specify a valid page number");
+                }
             }
 
-            var shows = showsResponse.Data;
+            RestRequest GetRequest()
+            {
+                var req = new RestRequest(_tvMazeAPIOptions.ShowPaginationTemplate, Method.GET);
 
-            await GetCastTasks(shows);
+                req.AddUrlSegment("page", page);
 
-            return shows;
+                return req;
+            }
         }
 
         private async Task GetCastTasks(IEnumerable<Show> shows)
@@ -89,29 +108,35 @@ namespace TvMazeScraper.Services
 
         private async Task GetCastFromAPI(Show show)
         {
-            var endpoint = _tvMazeAPIOptions.CastInfoTemplate;
-            var castRequest = new RestRequest(endpoint, Method.GET);
-
-            castRequest.AddUrlSegment("id", show.Id);
+            var castRequest = GetRequest();
 
             var client = _clientFactory.GetRestClient();
             var ct = new CancellationToken();
             var policy = GetAsyncRetryPolicy<List<CastResult>>();
 
-            var response = await client.ExecuteTaskAsyncWithPolicy(castRequest, ct, policy);
+            var castResponse = await client.ExecuteTaskAsyncWithPolicy(castRequest, ct, policy);
 
-            if (response.ErrorException != null)
+            if (castResponse.ErrorException != null)
             {
-                throw new Exception(response.ErrorMessage, response.ErrorException);
+                throw new Exception(castResponse.ErrorMessage, castResponse.ErrorException);
             }
 
-            var castResult = response.Data;
+            var castResult = castResponse.Data;
 
             if (castResult != null)
             {
                 var cast = castResult.Where(x => x != null).Select(CastMapper.Map);
 
                 show.Cast = cast.OrderByDescending(x => x.Birthday).ToList();
+            }
+
+            RestRequest GetRequest()
+            {
+                var req = new RestRequest(_tvMazeAPIOptions.CastInfoTemplate, Method.GET);
+
+                req.AddUrlSegment("id", show.Id);
+
+                return req;
             }
         }
 

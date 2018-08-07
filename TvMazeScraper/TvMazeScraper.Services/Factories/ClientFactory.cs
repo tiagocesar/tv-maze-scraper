@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using RestSharp;
 using TvMazeScraper.Domain.Options;
@@ -16,25 +17,41 @@ namespace TvMazeScraper.Services.Factories
             _mongoDbOptions = mongoDbOptions.Value;
             _tvMazeApiOptions = tvMazeAPIOptions.Value;
         }
-        
-        public MongoClient GetMongoDbClient()
+
+        public IMongoClient GetMongoDbClient()
         {
-            var user = _mongoDbOptions.User;
-            var password = _mongoDbOptions.Password;
-            var database = _mongoDbOptions.Database;
+            try
+            {
+                var user = _mongoDbOptions.User;
+                var password = _mongoDbOptions.Password;
+                var database = _mongoDbOptions.Database;
 
-            var mongoDbConnectionString = $"mongodb://{user}:{password}@ds113482.mlab.com:13482/{database}";
+                var mongoDbConnectionString = $"mongodb://{user}:{password}@ds113482.mlab.com:13482/{database}";
 
-            var client = new MongoClient(mongoDbConnectionString);
+                var client = new MongoClient(mongoDbConnectionString);
 
-            return client;
+                return client;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public IRestClient GetRestClient()
         {
-            var client = new RestClient(_tvMazeApiOptions.Endpoint);
+            try
+            {
+                var client = new RestClient(_tvMazeApiOptions.Endpoint);
 
-            return client;
+                return client;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

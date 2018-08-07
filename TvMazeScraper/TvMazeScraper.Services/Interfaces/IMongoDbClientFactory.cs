@@ -4,6 +4,6 @@ namespace TvMazeScraper.Services.Interfaces
 {
     public interface IMongoDbClientFactory
     {
-        MongoClient GetMongoDbClient();
+        IMongoClient GetMongoDbClient();
     }
 }
