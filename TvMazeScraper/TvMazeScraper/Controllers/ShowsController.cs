@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TvMazeScraper.Domain.Models;
 using TvMazeScraper.Services.Interfaces;
 
@@ -11,9 +12,12 @@ namespace TvMazeScraper.Controllers
     {
         private readonly IShowsService _showsService;
 
-        public ShowsController(IShowsService showsService)
+        private readonly ILogger<ShowsController> _logger;
+
+        public ShowsController(IShowsService showsService, ILogger<ShowsController> logger)
         {
             _showsService = showsService;
+            _logger = logger;
         }
         
         [HttpGet]
@@ -28,6 +32,7 @@ namespace TvMazeScraper.Controllers
 
             if (show == null)
             {
+                _logger.LogError("Failed to retrieve show with id {id}", id);
                 return NotFound();
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -15,10 +16,14 @@ namespace TvMazeScraper.Services
         private readonly IMongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
 
-        public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
+        private readonly ILogger<ShowsService> _logger;
+
+        public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions,
+            ILogger<ShowsService> logger)
         {
             _client = clientFactory.GetMongoDbClient();
             _mongoDbOptions = mongoDbOptions.Value;
+            _logger = logger;
         }
 
         private IMongoCollection<Show> GetShowsCollection()
@@ -46,10 +51,10 @@ namespace TvMazeScraper.Services
             {
                 throw new ArgumentException("The maximum number of documents per page is 100");
             }
-            
+
             var elementsToSkip = (page - 1) * count;
-            
-            var options = new FindOptions<Show> { Skip = elementsToSkip, Limit = count };
+
+            var options = new FindOptions<Show> {Skip = elementsToSkip, Limit = count};
 
             return options;
         }
@@ -61,7 +66,7 @@ namespace TvMazeScraper.Services
                 var collection = GetShowsCollection();
 
                 var options = GetListOptions(page, count);
-                
+
                 var cursor = await collection.FindAsync(new BsonDocument(), options);
 
                 var shows = await cursor.ToListAsync();
@@ -81,6 +86,8 @@ namespace TvMazeScraper.Services
 
             try
             {
+                _logger.LogInformation("Trying to get show with id {id}", id);
+                
                 var collection = GetShowsCollection();
 
                 var filter = Builders<Show>.Filter.Eq("_id", id);
