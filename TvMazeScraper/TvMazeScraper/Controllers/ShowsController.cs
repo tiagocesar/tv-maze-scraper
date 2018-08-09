@@ -19,7 +19,7 @@ namespace TvMazeScraper.Controllers
             _showsService = showsService;
             _logger = logger;
         }
-        
+
         [HttpGet]
         public async Task<List<Show>> Get(int page, int count) => await _showsService.List(page, count);
 
@@ -30,13 +30,14 @@ namespace TvMazeScraper.Controllers
         {
             var show = await _showsService.GetShow(id);
 
-            if (show == null)
+            if (show != null)
             {
-                _logger.LogError("Failed to retrieve show with id {id}", id);
-                return NotFound();
+                return Ok(show);
             }
 
-            return Ok(show);
+            _logger.LogError("Failed to retrieve show with id {id}", id);
+
+            return NotFound();
         }
     }
 }
