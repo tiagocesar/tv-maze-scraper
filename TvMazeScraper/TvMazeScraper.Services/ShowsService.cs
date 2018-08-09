@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -15,19 +17,33 @@ namespace TvMazeScraper.Services
         private readonly IMongoClient _client;
         private readonly MongoDbOptions _mongoDbOptions;
 
-        public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions)
+        private readonly ILogger<ShowsService> _logger;
+
+        public ShowsService(IMongoDbClientFactory clientFactory, IOptions<MongoDbOptions> mongoDbOptions,
+            ILogger<ShowsService> logger)
         {
             _client = clientFactory.GetMongoDbClient();
             _mongoDbOptions = mongoDbOptions.Value;
+            _logger = logger;
         }
 
-        private IMongoCollection<Show> GetShowsCollection()
+        private IMongoCollection<Show> GetShowCollection()
         {
-            var db = _client.GetDatabase(_mongoDbOptions.Database);
+            _logger.LogInformation("Retrieving the Show collection from MongoDb");
 
-            var collection = db.GetCollection<Show>("show");
+            try
+            {
+                var db = _client.GetDatabase(_mongoDbOptions.Database);
 
-            return collection;
+                var collection = db.GetCollection<Show>("show");
+
+                return collection;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(500, e, "Failure when trying to get the Show collection from MongoDb");
+                throw;
+            }
         }
 
         private static FindOptions<Show> GetListOptions(int page, int count)
@@ -46,10 +62,10 @@ namespace TvMazeScraper.Services
             {
                 throw new ArgumentException("The maximum number of documents per page is 100");
             }
-            
+
             var elementsToSkip = (page - 1) * count;
-            
-            var options = new FindOptions<Show> { Skip = elementsToSkip, Limit = count };
+
+            var options = new FindOptions<Show> {Skip = elementsToSkip, Limit = count};
 
             return options;
         }
@@ -58,10 +74,10 @@ namespace TvMazeScraper.Services
         {
             try
             {
-                var collection = GetShowsCollection();
+                var collection = GetShowCollection();
 
                 var options = GetListOptions(page, count);
-                
+
                 var cursor = await collection.FindAsync(new BsonDocument(), options);
 
                 var shows = await cursor.ToListAsync();
@@ -70,7 +86,9 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e,
+                    "Failure when trying to list the Show collection. Page: {page}, Count: {count}", page, count);
+
                 throw;
             }
         }
@@ -81,7 +99,9 @@ namespace TvMazeScraper.Services
 
             try
             {
-                var collection = GetShowsCollection();
+                _logger.LogInformation("Trying to get show with id {id}", id);
+
+                var collection = GetShowCollection();
 
                 var filter = Builders<Show>.Filter.Eq("_id", id);
 
@@ -91,7 +111,8 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e, "Failure when trying to retrieve show with Id {id}", id);
+
                 throw;
             }
 
@@ -106,9 +127,20 @@ namespace TvMazeScraper.Services
 
         public async Task AddShows(IEnumerable<Show> shows)
         {
-            var collection = GetShowsCollection();
+            _logger.LogInformation("Starting operation to add new shows to the Show collection");
 
-            await collection.InsertManyAsync(shows);
+            try
+            {
+                var collection = GetShowCollection();
+
+                await collection.InsertManyAsync(shows);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(500, e, "Failure when trying to add new shows to the Show collection");
+                
+                throw;
+            }
         }
     }
 }

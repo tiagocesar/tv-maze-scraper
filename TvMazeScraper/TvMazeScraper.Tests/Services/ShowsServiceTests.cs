@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
@@ -25,16 +26,18 @@ namespace TvMazeScraper.Tests.Services
 
             var mongoClientMock = new Mock<IMongoClient>();
             mongoClientMock.Setup(x => x.GetDatabase(It.IsAny<string>(), null)).Returns(mongoDatabaseMock.Object);
-            
+
             var clientFactoryMock = new Mock<IMongoDbClientFactory>();
-            
+
             clientFactoryMock.Setup(x => x.GetMongoDbClient()).Returns(mongoClientMock.Object);
-            
+
             var mongoDbOptionsMock = new Mock<IOptions<MongoDbOptions>>();
 
             mongoDbOptionsMock.Setup(x => x.Value).Returns(new MongoDbOptions());
 
-            var showsService = new ShowsService(clientFactoryMock.Object, mongoDbOptionsMock.Object);
+            var loggerMock = new Mock<ILogger<ShowsService>>();
+
+            var showsService = new ShowsService(clientFactoryMock.Object, mongoDbOptionsMock.Object, loggerMock.Object);
 
             return showsService;
         }
@@ -81,7 +84,9 @@ namespace TvMazeScraper.Tests.Services
             clientFactoryMock.Setup(x => x.GetMongoDbClient()).Returns(mongoClientMock.Object);
             mongoDbOptionsMock.Setup(x => x.Value).Returns(new MongoDbOptions());
 
-            var showsService = new ShowsService(clientFactoryMock.Object, mongoDbOptionsMock.Object);
+            var loggerMock = new Mock<ILogger<ShowsService>>();
+
+            var showsService = new ShowsService(clientFactoryMock.Object, mongoDbOptionsMock.Object, loggerMock.Object);
 
             await showsService.AddShows(new List<Show>());
 

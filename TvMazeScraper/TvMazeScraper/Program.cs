@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Serilog;
 
 namespace TvMazeScraper
 {
@@ -13,6 +14,13 @@ namespace TvMazeScraper
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseSerilog(ConfigureSerilog)
                 .Build();
+        
+        private static void ConfigureSerilog(WebHostBuilderContext ctx, LoggerConfiguration loggerConfiguration)
+        {
+            loggerConfiguration
+                .WriteTo.Console();
+        }
     }
 }

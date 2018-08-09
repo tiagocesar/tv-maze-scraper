@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TvMazeScraper.Services.Interfaces;
 
 namespace TvMazeScraper.Controllers
@@ -9,12 +10,21 @@ namespace TvMazeScraper.Controllers
     {
         private readonly ITvShowScraperService _tvShowScraperService;
 
-        public ShowScraperController(ITvShowScraperService tvShowScraperService)
+        private readonly ILogger<ShowScraperController> _logger;
+
+        public ShowScraperController(ITvShowScraperService tvShowScraperService, ILogger<ShowScraperController> logger)
         {
             _tvShowScraperService = tvShowScraperService;
+
+            _logger = logger;
         }
 
         [HttpPost]
-        public async Task ScrapeShows() => await _tvShowScraperService.ScrapeShows();
+        public async Task ScrapeShows()
+        {
+            _logger.LogInformation("Starting scraping of the shows API");
+
+            await _tvShowScraperService.ScrapeShows();
+        }
     }
 }
