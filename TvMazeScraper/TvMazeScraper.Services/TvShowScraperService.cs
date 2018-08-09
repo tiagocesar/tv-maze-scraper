@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
@@ -23,12 +24,16 @@ namespace TvMazeScraper.Services
         private readonly TvMazeAPIOptions _tvMazeAPIOptions;
         private readonly IShowsService _showsService;
 
+        private readonly ILogger<TvShowScraperService> _logger;
+
         public TvShowScraperService(IRestSharpClientFactory clientFactory, IOptions<TvMazeAPIOptions> tvMazeAPIOptions,
-            IShowsService showsService)
+            IShowsService showsService, ILogger<TvShowScraperService> logger)
         {
             _clientFactory = clientFactory;
             _tvMazeAPIOptions = tvMazeAPIOptions.Value;
             _showsService = showsService;
+
+            _logger = logger;
         }
 
         public async Task ScrapeShows()
@@ -54,11 +59,9 @@ namespace TvMazeScraper.Services
 
         public virtual async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
         {
-            ValidateParameters();
-
             try
             {
-                var showRequest = GetRequest();
+                var showRequest = GetRequest(page);
 
                 var client = _clientFactory.GetRestClient();
 
@@ -77,26 +80,24 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e, "Failure when trying to scrape shows info, page {page}", page);
+
                 throw;
             }
+        }
 
-            void ValidateParameters()
+        private IRestRequest GetRequest(int page)
+        {
+            if (page == default)
             {
-                if (page == default)
-                {
-                    throw new ArgumentException("Specify a valid page number");
-                }
+                throw new ArgumentException("Specify a valid page number");
             }
 
-            RestRequest GetRequest()
-            {
-                var req = new RestRequest(_tvMazeAPIOptions.ShowPaginationTemplate, Method.GET);
+            var req = new RestRequest(_tvMazeAPIOptions.ShowPaginationTemplate, Method.GET);
 
-                req.AddUrlSegment("page", page);
+            req.AddUrlSegment("page", page);
 
-                return req;
-            }
+            return req;
         }
 
         private async Task GetCastTasks(IEnumerable<Show> shows)

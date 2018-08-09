@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using TvMazeScraper.Domain.Models;
@@ -19,8 +20,10 @@ namespace TvMazeScraper.Tests.Services
             var tvMazeAPIOptions = new Mock<IOptions<TvMazeAPIOptions>>();
             var showsServiceMock = new Mock<IShowsService>();
 
+            var logMock = new Mock<ILogger<TvShowScraperService>>();
+
             return new TvShowScraperService(restSharpClientFactoryMock.Object, tvMazeAPIOptions.Object,
-                showsServiceMock.Object);
+                showsServiceMock.Object, logMock.Object);
         }
 
         [Fact]
@@ -38,8 +41,10 @@ namespace TvMazeScraper.Tests.Services
             var tvMazeAPIOptions = new Mock<IOptions<TvMazeAPIOptions>>();
             var showsServiceMock = new Mock<IShowsService>();
 
+            var logMock = new Mock<ILogger<TvShowScraperService>>();
+
             var tvShowScraperServiceMock = new Mock<TvShowScraperService>(restSharpClientFactoryMock.Object,
-                tvMazeAPIOptions.Object, showsServiceMock.Object);
+                tvMazeAPIOptions.Object, showsServiceMock.Object, logMock.Object);
 
             tvShowScraperServiceMock.Setup(x => x.ScrapeShowsInfo(1))
                 .ReturnsAsync(new List<Show> {new Show {Id = 1, Name = "Test 1"}});
@@ -53,7 +58,7 @@ namespace TvMazeScraper.Tests.Services
             var tvShowScraperService = tvShowScraperServiceMock.Object;
 
             await tvShowScraperService.ScrapeShows();
-            
+
             showsServiceMock.Verify(x => x.AddShows(It.IsAny<List<Show>>()), Times.Exactly(2));
         }
     }

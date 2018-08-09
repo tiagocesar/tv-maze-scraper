@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using RestSharp;
@@ -12,10 +13,15 @@ namespace TvMazeScraper.Services.Factories
         private readonly MongoDbOptions _mongoDbOptions;
         private readonly TvMazeAPIOptions _tvMazeApiOptions;
 
-        public ClientFactory(IOptions<MongoDbOptions> mongoDbOptions, IOptions<TvMazeAPIOptions> tvMazeAPIOptions)
+        private readonly ILogger<ClientFactory> _logger;
+
+        public ClientFactory(IOptions<MongoDbOptions> mongoDbOptions, IOptions<TvMazeAPIOptions> tvMazeAPIOptions,
+            ILogger<ClientFactory> logger)
         {
             _mongoDbOptions = mongoDbOptions.Value;
             _tvMazeApiOptions = tvMazeAPIOptions.Value;
+            
+            _logger = logger;
         }
 
         public IMongoClient GetMongoDbClient()
@@ -34,7 +40,8 @@ namespace TvMazeScraper.Services.Factories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e, "Failure when trying to retrieve a MongoDb client");
+                
                 throw;
             }
         }
@@ -49,7 +56,8 @@ namespace TvMazeScraper.Services.Factories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e, "Failure when trying to retrieve a Rest client");
+                
                 throw;
             }
         }

@@ -75,7 +75,8 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e,
+                    "Failure when trying to list the Show collection. Page: {page}, Count: {count}", page, count);
                 throw;
             }
         }
@@ -87,7 +88,7 @@ namespace TvMazeScraper.Services
             try
             {
                 _logger.LogInformation("Trying to get show with id {id}", id);
-                
+
                 var collection = GetShowsCollection();
 
                 var filter = Builders<Show>.Filter.Eq("_id", id);
@@ -98,7 +99,8 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(500, e, "Failure when trying to retrieve show with Id {id}", id);
+
                 throw;
             }
 
