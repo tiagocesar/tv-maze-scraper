@@ -38,6 +38,8 @@ namespace TvMazeScraper.Services
 
         public async Task ScrapeShows()
         {
+            _logger.LogInformation("Beginning scraping of the Shows API");
+            
             var endOfList = false;
             var page = 1;
 
@@ -59,6 +61,8 @@ namespace TvMazeScraper.Services
 
         public virtual async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
         {
+            _logger.LogInformation("Scraping page {page} of the Shows API", page);
+            
             try
             {
                 var showRequest = GetRequest(page);
@@ -69,6 +73,8 @@ namespace TvMazeScraper.Services
 
                 if (showsResponse.ErrorException != null)
                 {
+                    _logger.LogError(500, showsResponse.ErrorException, "Error when fetching data from the Shows API");
+                    
                     throw new Exception(showsResponse.ErrorMessage, showsResponse.ErrorException);
                 }
 
@@ -119,6 +125,8 @@ namespace TvMazeScraper.Services
 
             if (castResponse.ErrorException != null)
             {
+                _logger.LogError(500, castResponse.ErrorException, "Error when fetching data from the Cast API");
+                
                 throw new Exception(castResponse.ErrorMessage, castResponse.ErrorException);
             }
 

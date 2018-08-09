@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,13 +27,23 @@ namespace TvMazeScraper.Services
             _logger = logger;
         }
 
-        private IMongoCollection<Show> GetShowsCollection()
+        private IMongoCollection<Show> GetShowCollection()
         {
-            var db = _client.GetDatabase(_mongoDbOptions.Database);
+            _logger.LogInformation("Retrieving the Show collection from MongoDb");
 
-            var collection = db.GetCollection<Show>("show");
+            try
+            {
+                var db = _client.GetDatabase(_mongoDbOptions.Database);
 
-            return collection;
+                var collection = db.GetCollection<Show>("show");
+
+                return collection;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(500, e, "Failure when trying to get the Show collection from MongoDb");
+                throw;
+            }
         }
 
         private static FindOptions<Show> GetListOptions(int page, int count)
@@ -63,7 +74,7 @@ namespace TvMazeScraper.Services
         {
             try
             {
-                var collection = GetShowsCollection();
+                var collection = GetShowCollection();
 
                 var options = GetListOptions(page, count);
 
@@ -77,6 +88,7 @@ namespace TvMazeScraper.Services
             {
                 _logger.LogError(500, e,
                     "Failure when trying to list the Show collection. Page: {page}, Count: {count}", page, count);
+
                 throw;
             }
         }
@@ -89,7 +101,7 @@ namespace TvMazeScraper.Services
             {
                 _logger.LogInformation("Trying to get show with id {id}", id);
 
-                var collection = GetShowsCollection();
+                var collection = GetShowCollection();
 
                 var filter = Builders<Show>.Filter.Eq("_id", id);
 
@@ -115,9 +127,20 @@ namespace TvMazeScraper.Services
 
         public async Task AddShows(IEnumerable<Show> shows)
         {
-            var collection = GetShowsCollection();
+            _logger.LogInformation("Starting operation to add new shows to the Show collection");
 
-            await collection.InsertManyAsync(shows);
+            try
+            {
+                var collection = GetShowCollection();
+
+                await collection.InsertManyAsync(shows);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(500, e, "Failure when trying to add new shows to the Show collection");
+                
+                throw;
+            }
         }
     }
 }
