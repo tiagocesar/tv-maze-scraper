@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,18 +15,6 @@ namespace TvMazeScraper.Tests.Services
 {
     public class TvShowScraperServiceTests
     {
-        private TvShowScraperService GetService()
-        {
-            var restSharpClientFactoryMock = new Mock<IRestSharpClientFactory>();
-            var tvMazeAPIOptions = new Mock<IOptions<TvMazeAPIOptions>>();
-            var showsServiceMock = new Mock<IShowsService>();
-
-            var logMock = new Mock<ILogger<TvShowScraperService>>();
-
-            return new TvShowScraperService(restSharpClientFactoryMock.Object, tvMazeAPIOptions.Object,
-                showsServiceMock.Object, logMock.Object);
-        }
-
         [Fact]
         public async Task ScrapeShowsInfoWithInvalidParametersShouldThrow()
         {
@@ -59,9 +48,21 @@ namespace TvMazeScraper.Tests.Services
 
             var tvShowScraperService = tvShowScraperServiceMock.Object;
 
-            await tvShowScraperService.ScrapeShows();
+            await tvShowScraperService.DoWorkAsync(CancellationToken.None);
 
             showsServiceMock.Verify(x => x.AddShows(It.IsAny<List<Show>>()), Times.Exactly(2));
+        }
+
+        private TvShowScraperService GetService()
+        {
+            var restSharpClientFactoryMock = new Mock<IRestSharpClientFactory>();
+            var tvMazeAPIOptions = new Mock<IOptions<TvMazeAPIOptions>>();
+            var showsServiceMock = new Mock<IShowsService>();
+
+            var logMock = new Mock<ILogger<TvShowScraperService>>();
+
+            return new TvShowScraperService(restSharpClientFactoryMock.Object, tvMazeAPIOptions.Object,
+                showsServiceMock.Object, logMock.Object);
         }
     }
 }

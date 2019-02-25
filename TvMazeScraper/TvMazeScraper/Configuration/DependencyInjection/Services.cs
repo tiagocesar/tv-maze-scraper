@@ -11,7 +11,8 @@ namespace TvMazeScraper.Configuration.DependencyInjection
             IConfiguration configuration)
         {
             services.AddTransient<IShowsService, ShowsService>();
-            services.AddTransient<ITvShowScraperService, TvShowScraperService>();
+            
+            services.AddHostedService<TvShowScraperService>();
 
             return services;
         }
