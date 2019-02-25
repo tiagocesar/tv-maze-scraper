@@ -48,8 +48,10 @@ namespace TvMazeScraper.Tests.Services
 
             tvShowScraperServiceMock.Setup(x => x.ScrapeShowsInfo(1))
                 .ReturnsAsync(new List<Show> {new Show {Id = 1, Name = "Test 1"}});
+
             tvShowScraperServiceMock.Setup(x => x.ScrapeShowsInfo(2))
                 .ReturnsAsync(new List<Show> {new Show {Id = 2, Name = "Test 2"}});
+
             tvShowScraperServiceMock.Setup(x => x.ScrapeShowsInfo(3))
                 .ReturnsAsync(new List<Show>());
 

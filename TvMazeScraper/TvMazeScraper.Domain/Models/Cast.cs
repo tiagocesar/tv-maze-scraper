@@ -6,8 +6,10 @@ namespace TvMazeScraper.Domain.Models
     {
         [BsonId]
         public int Id { get; set; }
+
         [BsonElement("name")]
         public string Name { get; set; }
+
         [BsonElement("birthday")]
         public string Birthday { get; set; }
     }

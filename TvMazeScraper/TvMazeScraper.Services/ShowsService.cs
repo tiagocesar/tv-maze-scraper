@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,6 +41,7 @@ namespace TvMazeScraper.Services
             catch (Exception e)
             {
                 _logger.LogError(500, e, "Failure when trying to get the Show collection from MongoDb");
+
                 throw;
             }
         }
@@ -138,7 +138,7 @@ namespace TvMazeScraper.Services
             catch (Exception e)
             {
                 _logger.LogError(500, e, "Failure when trying to add new shows to the Show collection");
-                
+
                 throw;
             }
         }

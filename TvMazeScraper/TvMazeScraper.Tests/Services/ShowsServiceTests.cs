@@ -21,6 +21,7 @@ namespace TvMazeScraper.Tests.Services
             var mongoCollectionMock = new Mock<IMongoCollection<Show>>();
 
             var mongoDatabaseMock = new Mock<IMongoDatabase>();
+
             mongoDatabaseMock.Setup(x => x.GetCollection<Show>(It.IsAny<string>(), null))
                 .Returns(mongoCollectionMock.Object);
 
@@ -75,6 +76,7 @@ namespace TvMazeScraper.Tests.Services
             var mongoCollectionMock = new Mock<IMongoCollection<Show>>();
 
             var mongoDatabaseMock = new Mock<IMongoDatabase>();
+
             mongoDatabaseMock.Setup(x => x.GetCollection<Show>(It.IsAny<string>(), null))
                 .Returns(mongoCollectionMock.Object);
 
