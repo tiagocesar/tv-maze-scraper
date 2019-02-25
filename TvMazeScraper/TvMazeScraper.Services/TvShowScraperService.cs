@@ -12,33 +12,32 @@ using RestSharp;
 using TvMazeScraper.Domain.Models;
 using TvMazeScraper.Domain.Options;
 using TvMazeScraper.Domain.Responses;
+using TvMazeScraper.Services.Base;
 using TvMazeScraper.Services.Helpers;
 using TvMazeScraper.Services.Interfaces;
 using TvMazeScraper.Services.Mappers;
 
 namespace TvMazeScraper.Services
 {
-    public class TvShowScraperService : ITvShowScraperService
+    public class TvShowScraperService : ScheduledService<TvShowScraperService>
     {
         private readonly IRestSharpClientFactory _clientFactory;
         private readonly TvMazeAPIOptions _tvMazeAPIOptions;
         private readonly IShowsService _showsService;
 
-        private readonly ILogger<TvShowScraperService> _logger;
-
         public TvShowScraperService(IRestSharpClientFactory clientFactory, IOptions<TvMazeAPIOptions> tvMazeAPIOptions,
-            IShowsService showsService, ILogger<TvShowScraperService> logger)
+            IShowsService showsService, ILogger<TvShowScraperService> logger) : base(logger)
         {
             _clientFactory = clientFactory;
             _tvMazeAPIOptions = tvMazeAPIOptions.Value;
             _showsService = showsService;
 
-            _logger = logger;
+            DelayTimeSpan = TimeSpan.FromDays(1d);
         }
 
-        public async Task ScrapeShows()
+        public override async Task DoWorkAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Beginning scraping of the Shows API");
+            Logger.LogInformation("Beginning scraping of the Shows API");
 
             var endOfList = false;
             var page = 1;
@@ -62,7 +61,7 @@ namespace TvMazeScraper.Services
 
         public virtual async Task<IEnumerable<Show>> ScrapeShowsInfo(int page)
         {
-            _logger.LogInformation("Scraping page {page} of the Shows API", page);
+            Logger.LogInformation("Scraping page {page} of the Shows API", page);
 
             try
             {
@@ -74,7 +73,7 @@ namespace TvMazeScraper.Services
 
                 if (showsResponse.ErrorException != null)
                 {
-                    _logger.LogError(500, showsResponse.ErrorException, "Error when fetching data from the Shows API");
+                    Logger.LogError(500, showsResponse.ErrorException, "Error when fetching data from the Shows API");
 
                     throw new Exception(showsResponse.ErrorMessage, showsResponse.ErrorException);
                 }
@@ -87,7 +86,7 @@ namespace TvMazeScraper.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(500, e, "Failure when trying to scrape shows info, page {page}", page);
+                Logger.LogError(500, e, "Failure when trying to scrape shows info, page {page}", page);
 
                 throw;
             }
@@ -126,7 +125,7 @@ namespace TvMazeScraper.Services
 
             if (castResponse.ErrorException != null)
             {
-                _logger.LogError(500, castResponse.ErrorException, "Error when fetching data from the Cast API");
+                Logger.LogError(500, castResponse.ErrorException, "Error when fetching data from the Cast API");
 
                 throw new Exception(castResponse.ErrorMessage, castResponse.ErrorException);
             }
