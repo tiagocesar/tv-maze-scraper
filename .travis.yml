@@ -4,8 +4,8 @@ sudo: required
 dist: xenial
 dotnet: 2.2
 script:
-    - dotnet restore
-    - dotnet build
+    - dotnet restore TvMazeScraper/TvMazeScraper.sln
+    - dotnet build TvMazeScraper/TvMazeScraper.sln
     - dotnet test TvMazeScraper/TvMazeScraper.Tests/TvMazeScraper.Tests.csproj
 global:
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
