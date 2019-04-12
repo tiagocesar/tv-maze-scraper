@@ -8,9 +8,9 @@ matrix:
   include:
     - os: linux 
       dist: trusty # Ubuntu 14.04
-      dotnet: 2.1
+      dotnet: 2.2.203
     - os: osx
-      dotnet: 2.1.300
+      dotnet: 2.2.106
       osx_image: xcode8.3 # dotnet requires at least this version
 
 before_install:
@@ -18,5 +18,5 @@ before_install:
   - if [ $TRAVIS_OS_NAME = osx ]; then ulimit -S -n 4096; fi
 
 script:
-  - dotnet build TvMazeScraper/TvMazeScraper.csproj -c Release -f netcoreapp2.1
-  - dotnet test --no-build -c Release -f netcoreapp2.1 TvMazeScraper/TvMazeScraper.csproj --filter "RestClient=RestClient|RPCClient=RPCClient|Protocol=Protocol|Core=Core|UnitTest=UnitTest" -p:ParallelizeTestCollections=false
+  - dotnet build TvMazeScraper/TvMazeScraper.sln -c Release -f netcoreapp2.1
+  - dotnet test --no-build -c Release -f netcoreapp2.2 TvMazeScraper/TvMazeScraper.sln --filter "RestClient=RestClient|RPCClient=RPCClient|Protocol=Protocol|Core=Core|UnitTest=UnitTest" -p:ParallelizeTestCollections=false
